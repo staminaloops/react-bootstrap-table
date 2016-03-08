@@ -348,7 +348,6 @@ export class TableDataStore {
 
   /* General search function
    * It will search for the text if the input includes that text;
-   * It will search for exact number if the input is that number
    */
   search(searchText) {
     if (searchText.trim() === "") {
@@ -374,7 +373,7 @@ export class TableDataStore {
         for (let i = 0, keysLength = keys.length; i < keysLength; i++) {
           const key = keys[i];
           if (this.colInfos[key] && row[key]) {
-            const { format, filterFormatted, formatExtraData, searchable, hidden } = this.colInfos[key];
+            const { format, filterFormatted, formatExtraData, searchable } = this.colInfos[key];
             let targetVal = row[key];
             if (searchable) {
               if (filterFormatted && format) {
