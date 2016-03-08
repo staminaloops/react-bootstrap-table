@@ -5,7 +5,7 @@ function _sort(arr, sortField, order, sortFunc) {
   order = order.toLowerCase();
   arr.sort((a, b) => {
     if (sortFunc) {
-      return sortFunc(a, b, order);
+      return sortFunc(a, b, order, sortField);
     } else {
       if (order == Const.SORT_DESC) {
         return a[sortField] > b[sortField] ? -1 : ((a[sortField] < b[sortField]) ? 1 : 0);
@@ -144,6 +144,23 @@ export class TableDataStore {
       if (null !== this.searchText) this.search(this.searchText);
     }
     return this;
+  }
+
+  addAtBegin(newObj) {
+    if (!newObj[this.keyField] || newObj[this.keyField].toString() === '') {
+      throw this.keyField + " can't be empty value.";
+    }
+    let currentDisplayData = this.getCurrentDisplayData();
+    currentDisplayData.forEach(function (row) {
+      if (row[this.keyField].toString() === newObj[this.keyField].toString()) {
+        throw this.keyField + " " + newObj[this.keyField] + " already exists";
+      }
+    }, this);
+    console.log('@@');
+    currentDisplayData.unshift(newObj);
+    if (this.isOnFilter) {
+      this.data.unshift(newObj);
+    }
   }
 
   add(newObj) {
@@ -363,21 +380,11 @@ export class TableDataStore {
               if (filterFormatted && format) {
                 targetVal = format(targetVal, row, formatExtraData);
               }
-              if (typeof targetVal !== 'number') {
-                for (let j = 0, textLength = searchTextArray.length; j < textLength; j++) {
-                  const filterVal = searchTextArray[j].toLowerCase();
-                  if (targetVal.toString().toLowerCase().indexOf(filterVal) !== -1) {
-                    valid = true;
-                    break;
-                  }
-                }
-              } else {
-                for (let k = 0, textLength = searchTextArray.length; k < textLength; k++) {
-                  const filterVal = searchTextArray[k].toLowerCase();
-                  if (parseInt(targetVal, 10) === parseInt(filterVal, 10)) {
-                    valid = true;
-                    break;
-                  }
+              for (let j = 0, textLength = searchTextArray.length; j < textLength; j++) {
+                const filterVal = searchTextArray[j].toLowerCase();
+                if (targetVal.toString().toLowerCase().indexOf(filterVal) !== -1) {
+                  valid = true;
+                  break;
                 }
               }
             }
